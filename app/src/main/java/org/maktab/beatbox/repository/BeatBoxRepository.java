@@ -3,9 +3,13 @@ package org.maktab.beatbox.repository;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import org.maktab.beatbox.model.Sound;
 
@@ -25,6 +29,7 @@ public class BeatBoxRepository {
     public static final int SOUND_PRIORITY = 1;
     private static BeatBoxRepository sInstance;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static BeatBoxRepository getInstance(Context context) {
         if (sInstance == null)
             sInstance = new BeatBoxRepository(context);
@@ -53,10 +58,18 @@ public class BeatBoxRepository {
         return mSoundPool;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private BeatBoxRepository(Context context) {
         mContext = context.getApplicationContext();
         mAssetManager = mContext.getAssets();
-        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+        SoundPool.Builder builder = new SoundPool.Builder();
+        AudioAttributes.Builder audioAttributesBuilder = new AudioAttributes.Builder();
+        AudioAttributes audioAttributes = audioAttributesBuilder.setUsage(AudioAttributes.USAGE_GAME).
+                setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+        mSoundPool =builder.setMaxStreams(MAX_STREAMS).
+                setAudioAttributes(audioAttributes).build() ;
+             /*   new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);*/
 
         mSounds = new ArrayList<>();
         try {
