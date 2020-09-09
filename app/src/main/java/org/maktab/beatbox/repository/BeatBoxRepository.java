@@ -1,7 +1,10 @@
 package org.maktab.beatbox.repository;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.util.Log;
 
 import org.maktab.beatbox.model.Sound;
@@ -15,6 +18,8 @@ public class BeatBoxRepository {
 
     private static final String ASSET_SOUND_FOLDER = "sample_sounds";
     public static final String TAG = "BeatBox";
+    public static final int MAX_STREAMS = 5;
+    public static final int SOUND_PRIORITY = 1;
     private static BeatBoxRepository sInstance;
 
     public static BeatBoxRepository getInstance(Context context) {
@@ -27,6 +32,7 @@ public class BeatBoxRepository {
     private Context mContext;
     private AssetManager mAssetManager;
     private List<Sound> mSounds;
+    private SoundPool mSoundPool;
 
     public static void setInstance(BeatBoxRepository instance) {
         sInstance = instance;
@@ -43,6 +49,7 @@ public class BeatBoxRepository {
     private BeatBoxRepository(Context context) {
         mContext = context.getApplicationContext();
         mAssetManager = mContext.getAssets();
+        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
 
         mSounds = new ArrayList<>();
         try {
@@ -52,10 +59,21 @@ public class BeatBoxRepository {
                 String assetPath = ASSET_SOUND_FOLDER + File.separator + fileName;
 
                 Sound sound = new Sound(assetPath);
+
+                AssetFileDescriptor afd = mAssetManager.openFd(assetPath);
+                int soundId = mSoundPool.load(afd, SOUND_PRIORITY);
+                sound.setSoundId(soundId);
+
                 mSounds.add(sound);
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         }
+    }
+
+    private void play(Sound sound) {
+        //check if not loaded then return
+        if (sound.getSoundId() == null)
+            return;
     }
 }
