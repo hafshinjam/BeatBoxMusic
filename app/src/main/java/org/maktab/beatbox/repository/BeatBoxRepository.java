@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is not a repository class. it only mimic the repository behaviour.
+ */
 public class BeatBoxRepository {
 
     private static final String ASSET_SOUND_FOLDER = "sample_sounds";
@@ -46,6 +49,10 @@ public class BeatBoxRepository {
         mSounds = sounds;
     }
 
+    public SoundPool getSoundPool() {
+        return mSoundPool;
+    }
+
     private BeatBoxRepository(Context context) {
         mContext = context.getApplicationContext();
         mAssetManager = mContext.getAssets();
@@ -69,11 +76,5 @@ public class BeatBoxRepository {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         }
-    }
-
-    private void play(Sound sound) {
-        //check if not loaded then return
-        if (sound.getSoundId() == null)
-            return;
     }
 }

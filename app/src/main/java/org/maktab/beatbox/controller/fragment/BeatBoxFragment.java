@@ -1,28 +1,29 @@
 package org.maktab.beatbox.controller.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-
 import org.maktab.beatbox.R;
 import org.maktab.beatbox.model.Sound;
 import org.maktab.beatbox.repository.BeatBoxRepository;
+import org.maktab.beatbox.utils.SoundUtils;
 
 import java.util.List;
 
 public class BeatBoxFragment extends Fragment {
 
     public static final int SPAN_COUNT = 3;
+    public static final String TAG = "BBF";
     private RecyclerView mRecyclerView;
-    private SoundAdapter mAdapter;
     private BeatBoxRepository mRepository;
 
     public BeatBoxFragment() {
@@ -39,20 +40,39 @@ public class BeatBoxFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCrete");
 
+        setRetainInstance(true);
         mRepository = BeatBoxRepository.getInstance(getContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_beat_box, container, false);
 
+        Log.d(TAG, "onCreteView");
         findViews(view);
         initViews();
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Log.d(TAG, "onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
+
+        mRepository.getSoundPool().release();
     }
 
     private void findViews(View view) {
@@ -61,17 +81,13 @@ public class BeatBoxFragment extends Fragment {
 
     private void initViews() {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), SPAN_COUNT));
-        updateUI();
+        initUI();
     }
 
-    private void updateUI() {
+    private void initUI() {
         List<Sound> sounds = mRepository.getSounds();
-        if (mAdapter == null) {
-            mAdapter = new SoundAdapter(sounds);
-            mRecyclerView.setAdapter(mAdapter);
-        } else {
-            mAdapter.notifyDataSetChanged();
-        }
+        SoundAdapter adapter = new SoundAdapter(sounds);
+        mRecyclerView.setAdapter(adapter);
     }
 
     private class SoundHolder extends RecyclerView.ViewHolder {
@@ -83,6 +99,16 @@ public class BeatBoxFragment extends Fragment {
             super(itemView);
 
             mButtonSound = itemView.findViewById(R.id.list_item_button_sound);
+            mButtonSound.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        SoundUtils.play(mRepository.getSoundPool(), mSound);
+                    } catch (Exception e) {
+                        Log.e(BeatBoxRepository.TAG, e.getMessage(), e);
+                    }
+                }
+            });
         }
 
         public void bindSound(Sound sound) {
