@@ -1,0 +1,24 @@
+package org.maktab.beatbox.controller.activity;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import android.os.Bundle;
+
+import org.maktab.beatbox.R;
+import org.maktab.beatbox.controller.activity.SingleFragmentActivity;
+import org.maktab.beatbox.controller.fragment.BeatBoxFragment;
+
+public class BeatBoxActivity extends SingleFragmentActivity {
+
+
+    @Override
+    public Fragment createFragment() {
+        return BeatBoxFragment.newInstance();
+    }
+
+    @Override
+    public int getLayoutResId() {
+        return R.layout.activity_single_fragment;
+    }
+}
