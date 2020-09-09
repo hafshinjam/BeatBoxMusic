@@ -1,5 +1,7 @@
 package org.maktab.beatbox.model;
 
+import java.io.File;
+
 public class Sound {
 
     private String mName;
@@ -21,8 +23,15 @@ public class Sound {
         mAssetPath = assetPath;
     }
 
-    public Sound(String name, String assetPath) {
-        mName = name;
+    public Sound(String assetPath) {
+        //example: assetPath: sample_sounds/65_cjipie.wav
         mAssetPath = assetPath;
+        mName = extractFileName(mAssetPath);
+    }
+
+    private String extractFileName(String assetPath) {
+        String[] segments = assetPath.split(File.separator);
+        String fileNameWithExt = segments[segments.length - 1];
+        return fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf("."));
     }
 }

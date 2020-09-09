@@ -40,7 +40,7 @@ public class BeatBoxFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepository = BeatBoxRepository.getInstance();
+        mRepository = BeatBoxRepository.getInstance(getContext());
     }
 
     @Override
